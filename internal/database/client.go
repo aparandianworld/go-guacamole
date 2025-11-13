@@ -1,10 +1,12 @@
 package database
 
 import (
+	"context"
 	"fmt"
 
 	"time"
 
+	"github.com/aparandianworld/go-guacamole/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
@@ -12,6 +14,7 @@ import (
 
 type DatabaseClient interface {
 	Ready() bool
+	GetAllCustomers(ctx context.Context, emailAddress string) ([]models.Customer, error)
 }
 
 type Client struct {
