@@ -1,9 +1,20 @@
 package main
 
 import (
-	"fmt"
+	"log"
+
+	"github.com/aparandianworld/go-guacamole/internal/database"
+	"github.com/aparandianworld/go-guacamole/internal/server"
 )
 
 func main() {
-	fmt.Println("Hello from go-guacamole!")
+	db, err := database.NewDatabaseClient()
+	if err != nil {
+		log.Fatalf("Failed to initialize database client: %s", err)
+	}
+
+	srv := server.NewEchoServer(db)
+	if err := srv.Start(); err != nil {
+		log.Fatalf("Server failed to start: %s", err)
+	}
 }

@@ -5,11 +5,14 @@ import (
 	"net/http"
 
 	"github.com/aparandianworld/go-guacamole/internal/database"
+	"github.com/aparandianworld/go-guacamole/internal/models"
 	"github.com/labstack/echo/v4"
 )
 
 type Server interface {
 	Start() error
+	Readiness(ctx echo.Context) error
+	Liveness(ctx echo.Context) error
 }
 
 type EchoServer struct {
@@ -36,5 +39,18 @@ func (s *EchoServer) Start() error {
 }
 
 func (s *EchoServer) registerRoutes() {
-	// TODO: Register routes here
+	s.echo.GET("/readiness", s.Readiness)
+	s.echo.GET("/liveness", s.Liveness)
+}
+
+func (s *EchoServer) Readiness(ctx echo.Context) error {
+	ready := s.DB.Ready()
+	if ready {
+		return ctx.JSON(http.StatusOK, models.Health{Status: "ok"})
+	}
+	return ctx.JSON(http.StatusInternalServerError, models.Health{Status: "not ready"})
+}
+
+func (s *EchoServer) Liveness(ctx echo.Context) error {
+	return ctx.JSON(http.StatusOK, models.Health{Status: "ok"})
 }
